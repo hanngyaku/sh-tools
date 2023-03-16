@@ -18,7 +18,7 @@ do
     # 使用-o选项指定解压后的目录
     7z x "$file" -pwww.52cos.top -y -o"${file%/*}" > /dev/null
     if [ $? -eq 0 ]; then  # 检查解压返回值
-        # rm -f "$file"  # 删除源文件
+        rm -f "$file"  # 删除源文件
         current=$((current+1))
         echo "Extracted $file" >> "$log_file"  # 记录解压成功的文件名到日志文件
     else
