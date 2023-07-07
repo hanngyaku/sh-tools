@@ -5,6 +5,7 @@
 ### nohup命令
 
   nohup [command] parameter
+  
   nohup ./gitStore/sh-tools/scan_images.sh ~/mnt/smb/cgg_NAS-05718-08027/百度网盘/52cos
 
 #### kill nohup
