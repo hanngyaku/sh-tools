@@ -21,7 +21,7 @@ class Mangacross:
         self.comic_name = comic_name
         self.url_base = 'https://mangacross.jp'
         self.url_comic = '{}/comics/{}'.format(self.url_base, self.comic_name)
-        self.save_dir_base = 'e:/test/img'
+        self.save_dir_base = '/Users/cgg/Desktop/img'
         if not path.exists(self.save_dir_base):
             os.makedirs(self.save_dir_base)
 
@@ -130,7 +130,7 @@ class Mangacross:
     def download_img(self, img_dir, comic_name, episode):
         save_dir = '{}/{}/{}'.format(self.save_dir_base, comic_name, episode)
         if not path.exists(save_dir):
-            os.mkdir(save_dir)
+            os.makedirs(save_dir)
 
         for key, value in img_dir.items():
             file_name = '{}/{}.jpg'.format(save_dir, key)
@@ -167,20 +167,9 @@ def parse_html_local():
 
 
 def test():
-    img_dict = {
-        '1': "https://mangacross.jp/images/comic_page_promotion/bjWLxctoAdEckMVbDCObTNT5kM3D8RFmHuoYIIli400/image/original.jpg"
-    }
-    save_dir = 'e:/test/yabai'
-    if not path.exists(save_dir):
-        os.makedirs(save_dir)
-
-    for key, value in img_dict.items():
-        r = requests.get(value)
-        file_name = '{}/{}.jpg'.format(save_dir, key)
-        with open(file_name, 'wb') as f:
-            f.write(r.content)
-
-
+    url = 'https://mangacross.jp/images/episode_page/CB1FOYOEsirt3WYZSk-RSNf1V-EIUmiQ3QhdP9P2glI/image/pc.jpg'
+    r = requests.get(url)
+    print(len(r.content))
 mangacross = Mangacross(comic_name='yabai')
 mangacross.start_selenium()
 # parse_html_local()
