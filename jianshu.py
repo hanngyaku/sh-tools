@@ -13,7 +13,7 @@ from os import path
 import json
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from selenium.webdriver.edge.options import Options
 
 class Mangacross:
     # url = 'https://mangacross.jp/comics/yabai/132'
@@ -21,7 +21,8 @@ class Mangacross:
         self.comic_name = comic_name
         self.url_base = 'https://mangacross.jp'
         self.url_comic = '{}/comics/{}'.format(self.url_base, self.comic_name)
-        self.save_dir_base = '/Users/cgg/Desktop/img'
+        # self.save_dir_base = '/Users/cgg/Desktop/img'
+        self.save_dir_base = 'e:/test/img'
         if not path.exists(self.save_dir_base):
             os.makedirs(self.save_dir_base)
 
@@ -30,7 +31,12 @@ class Mangacross:
         for episode, url in dic_episode.items():
             if self.shoud_selenium(episode):
                 self.selenium(episode, url)
-
+    def make_selenium(self, open_web = False):
+        options = Options()
+        if not open_web:
+            options.add_argument('headless')
+        driver = webdriver.ChromiumEdge(options)
+        return driver
     def shoud_selenium(self, episode):
         save_dir = '{}/{}/{}'.format(self.save_dir_base, self.comic_name, episode)
         if path.exists(save_dir):
@@ -42,7 +48,7 @@ class Mangacross:
         解析主页的内容，查看当前更新的集数
         :return:
         """
-        driver = webdriver.ChromiumEdge()
+        driver = self.make_selenium()
         driver.get(self.url_comic)
         driver.maximize_window()
         # # 向下滚动200个像素
@@ -72,7 +78,7 @@ class Mangacross:
         url_episode = '{}{}'.format(self.url_base, url)
         print('start selenium: {}'.format(url_episode))
 
-        driver = webdriver.ChromiumEdge()
+        driver = self.make_selenium(open_web=True)
         driver.get(url_episode)
         driver.maximize_window()
 
