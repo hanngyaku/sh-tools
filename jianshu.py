@@ -1,19 +1,30 @@
 # coding=utf-8
 import os
-
-from bs4 import BeautifulSoup
 import re
-from selenium import webdriver
-import time
+import json
 import requests
+from bs4 import BeautifulSoup
+from xvfbwrapper import Xvfb
+from os import path
+from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-from os import path
-import json
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.edge.options import Options
+from selenium.webdriver.chrome.options import Options
+
+def make_selenium():
+    options = Options()
+    # options.add_argument('--headless') --无界面模式
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--incognito")
+    options.add_argument("--disable-site-isolation-trials")
+
+    service = Service(executable_path='/usr/bin/chromedriver')
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver
 
 class Mangacross:
     # url = 'https://mangacross.jp/comics/yabai/132'
@@ -22,21 +33,29 @@ class Mangacross:
         self.url_base = 'https://mangacross.jp'
         self.url_comic = '{}/comics/{}'.format(self.url_base, self.comic_name)
         # self.save_dir_base = '/Users/cgg/Desktop/img'
-        self.save_dir_base = 'e:/test/img'
+        self.save_dir_base = 'comic/img'
         if not path.exists(self.save_dir_base):
             os.makedirs(self.save_dir_base)
 
     def start_selenium(self):
+        display = Xvfb(width=1920, height=1080)
+        display.start()
+        # try:
+        #     dic_episode = self.get_episode_info()
+        #     for episode, url in dic_episode.items():
+        #         if self.shoud_selenium(episode):
+        #             self.selenium(episode, url)
+        # except BaseException as e:
+        #     print("errorinfo:", e)
+        # else:
+        #     pass
+
         dic_episode = self.get_episode_info()
         for episode, url in dic_episode.items():
             if self.shoud_selenium(episode):
                 self.selenium(episode, url)
-    def make_selenium(self, open_web = False):
-        options = Options()
-        if not open_web:
-            options.add_argument('headless')
-        driver = webdriver.ChromiumEdge(options)
-        return driver
+
+        display.stop()
     def shoud_selenium(self, episode):
         save_dir = '{}/{}/{}'.format(self.save_dir_base, self.comic_name, episode)
         if path.exists(save_dir):
@@ -48,7 +67,7 @@ class Mangacross:
         解析主页的内容，查看当前更新的集数
         :return:
         """
-        driver = self.make_selenium()
+        driver = make_selenium()
         driver.get(self.url_comic)
         driver.maximize_window()
         # # 向下滚动200个像素
@@ -78,7 +97,7 @@ class Mangacross:
         url_episode = '{}{}'.format(self.url_base, url)
         print('start selenium: {}'.format(url_episode))
 
-        driver = self.make_selenium(open_web=True)
+        driver = make_selenium()
         driver.get(url_episode)
         driver.maximize_window()
 
@@ -148,7 +167,6 @@ class Mangacross:
             with open(file_name, 'wb') as f:
                 f.write(r.content)
 
-
 # test_selenium()
 def parse_html_local():
     with open("test.html", "r", encoding='UTF-8') as f:
@@ -170,7 +188,6 @@ def parse_html_local():
             # result1 = re.search(pattern, item_str)
             # if result1:
             #     print('page = {}, url = {}'.format(page_index, result1.group()))
-
 
 def test():
     url = 'https://mangacross.jp/images/episode_page/CB1FOYOEsirt3WYZSk-RSNf1V-EIUmiQ3QhdP9P2glI/image/pc.jpg'
